@@ -1,6 +1,4 @@
 clear; close all;
-global iterations
-iterations = 0;
 
 Sys = BreachSimulinkSystem('cannonball');
 Sys.PrintParams();
@@ -19,18 +17,19 @@ SysFalsify.SetParamRanges({'LaunchAngle_u0', 'LaunchVelocity_u0'}, [0 90; 0 50])
 phi = STL_Formula('phi', 'alw(((Y[t] < 0.5) and (Y[t] > 0)) => ((X[t] > 40.5) or (X[t] < 39.5)))');
 
 
-semantics = ["max", "add", "MARV", "constant"];
-results_iterations = nan(1, numel(semantics));
-results_time = nan(1, numel(semantics));
-for i=1:numel(semantics)
-    phi_test = set_semantics(phi, semantics(i));
-    req = BreachRequirement(phi_test);
-    falsify = FalsificationProblem(SysFalsify, req);
-    falsify.solve();
-    results_time(i) = falsify.time_spent;
-    results_iterations(i) = falsify.nb_obj_eval;
-    fprintf('%d iterations\n', round(iterations))
-end
+% %semantics = ["max", "add", "MARV", "constant", "TeLEx"];
+% semantics = ["TeLEx"];
+% results_iterations = nan(1, numel(semantics));
+% results_time = nan(1, numel(semantics));
+% for i=1:numel(semantics)
+%     phi_test = set_semantics(phi, semantics(i));
+%     req = BreachRequirement(phi_test);
+%     falsify = FalsificationProblem(SysFalsify, req);
+%     falsify.max_obj_eval = 1000;
+%     falsify.solve();
+%     results_time(i) = falsify.time_spent;
+%     results_iterations(i) = falsify.nb_obj_eval;
+% end
 
 
 %% Plot robustness
@@ -39,7 +38,7 @@ vals = zeros(1, numel(xs));
 phi = STL_Formula('phi', 'alw(((Y[t] < 10) and (Y[t] > 0)) => ((X[t] > 40.15) or (X[t] < 39.85)))');
 
 
-phi_test = set_semantics(phi, "max");
+phi_test = set_semantics(phi, "TeLEx");
 for i = 1:numel(xs)
     SysFalsify.SetParam({'LaunchAngle_u0', 'LaunchVelocity_u0'}, [xs(i); 20]);
     SysFalsify.Sim();

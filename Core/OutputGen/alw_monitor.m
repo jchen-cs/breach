@@ -31,6 +31,7 @@ classdef alw_monitor < stl_monitor
         end
         
         function [v, t, Xout] = eval(this, t, X,p)
+            TeLEx_gamma = 0.01;
             [t, Xout] = this.computeSignals(t, X,p);
             idx  = this.get_time_idx_interval(t,p);
             Xout(end-1,:) = Xout(end,:)<0;         % violation flags
@@ -53,6 +54,8 @@ classdef alw_monitor < stl_monitor
             switch semantics
                 case 'max'
                     v = min(valarray);
+                case 'TeLEx'
+                    v = TeLExExpand(TeLEx_gamma, I___(1), I___(end)) * min(valarray);
                 case 'add'
                     %[time_values, valarray] = RobustAvEvRight(time_values, -valarray, I___);
                     %valarray = -valarray;

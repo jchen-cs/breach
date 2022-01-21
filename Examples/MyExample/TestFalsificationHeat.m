@@ -17,8 +17,7 @@ SysFalsify.SetInputGen(InputGen);
 
 ComfortableTemp = STL_Formula('ComfortableTemp', 'alw((RoomTemp[t] >= 50) & (RoomTemp[t] <= 80))');
 
-global iterations;
-iterations = 0;
+
 
 SysFalsify.SetParamRanges({'OutdoorTemp_u0', 'HeaterTemp_u0'}, [0 30; 40 50]);
 req = BreachRequirement(ComfortableTemp);
@@ -28,7 +27,6 @@ falsify = FalsificationProblem(SysFalsify, req);
 %falsify.solver = 'simulated_annealing'
 %falsify.startSample = []
 falsify.solve();
-fprintf('%d iterations\n', round(iterations))
 
 cex = falsify.GetFalse();
 cex.PlotSignals({'OutdoorTemp', 'HeaterTemp', 'RoomTemp'});

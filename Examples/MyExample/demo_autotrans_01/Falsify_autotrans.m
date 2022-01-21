@@ -1,6 +1,4 @@
 clear; close all;
-global iterations
-iterations = 0;
 
 Sys = BreachSimulinkSystem('sldemo_autotrans_mod01');
 Sys.PrintParams();
@@ -17,29 +15,26 @@ SysFalsify.SetParamRanges({'Throttle_u0'}, [0 70]);
 
 phi = STL_Formula('phi', 'alw_[0, 30] ((RPM[t] < 4500) & (Speed[t] < 120))');
 
-req = BreachRequirement(phi);
+% req = BreachRequirement(phi);
+% 
+% falsify = FalsificationProblem(SysFalsify, req);
+% 
+% falsify.solve();
+% 
+% 
+% cex = falsify.GetFalse();
+% cex.PlotSignals({'Throttle', 'Speed', 'RPM'});
 
-falsify = FalsificationProblem(SysFalsify, req);
 
-falsify.solve();
-
-fprintf('%d iterations\n', round(iterations))
-
-cex = falsify.GetFalse();
-cex.PlotSignals({'Throttle', 'Speed', 'RPM'});
-
-
-semantics = ["max", "add", "MARV", "constant"];
+semantics = ["max", "add", "MARV", "constant", "TeLEx"];
 results_iterations = nan(1, numel(semantics));
 results_time = nan(1, numel(semantics));
 for i=1:numel(semantics)
-    iterations = 0;
     phi_test = set_semantics(phi, semantics(i));
     req = BreachRequirement(phi_test);
     falsify = FalsificationProblem(SysFalsify, req);
-    tic
     falsify.solve();
-    results_time(i) = toc;
-    results_iterations(i) = iterations;
-    fprintf('%d iterations\n', round(iterations))
+    results_time(i) = falsify.time_spent;
+    results_iterations(i) = falsify.nb_obj_eval;
 end
+

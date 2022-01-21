@@ -140,6 +140,10 @@ function [valarray, time_values] = GetValues(Sys, phi, P, traj, interval)
 global BreachGlobOpt;
 eval(BreachGlobOpt.GlobVarsDeclare);
 
+% Constants for TeLEx semantics
+TeLEx_beta = 1;
+TeLEx_gamma = 0.01;
+
 switch(phi.type)
     
     case 'predicate'
@@ -155,6 +159,11 @@ switch(phi.type)
             valarray = arrayfun(evalfn, time_values);
         end
         
+        switch phi.semantics
+            case 'TeLEx'
+                valarray = TeLExPeak(TeLEx_beta, valarray); 
+        end
+        
     case 'not'
         [valarray, time_values] = GetValues(Sys, phi.phi, P, traj, interval);
         valarray = - valarray;
@@ -166,6 +175,9 @@ switch(phi.type)
         switch phi.semantics
             case 'max'
                 [time_values, valarray] = RobustOr(time_values1, valarray1, time_values2, valarray2);
+            case 'TeLEx'
+                [time_values, valarray] = RobustOr(time_values1, valarray1, time_values2, valarray2);
+
             case 'add'
                 % ||+
                 [time_values, valarray] = robustAndPlus(time_values1, -valarray1, time_values2, -valarray2);
@@ -192,6 +204,9 @@ switch(phi.type)
             case 'max'
                 % Standard and
                 [time_values, valarray] = RobustAnd(time_values1, valarray1, time_values2, valarray2);
+            case 'TeLEx'
+                [time_values, valarray] = RobustAnd(time_values1, valarray1, time_values2, valarray2);
+
             case 'add'
                 % Koen's &+
                 [time_values, valarray] = robustAndPlus(time_values1, valarray1, time_values2, valarray2);
@@ -226,6 +241,9 @@ switch(phi.type)
         switch phi.semantics
             case 'max'
                 [time_values, valarray] = RobustOr(time_values1, valarray1, time_values2, valarray2);
+            case 'TeLEx'
+                [time_values, valarray] = RobustOr(time_values1, valarray1, time_values2, valarray2);
+            
             case 'add'
                 % Standard implication, but with vbool andPlus
                 [time_values, valarray] = robustAndPlus(time_values1, -valarray1, time_values2, -valarray2);
@@ -277,6 +295,13 @@ switch(phi.type)
                 end
                 [time_values, valarray] = RobustEv(time_values, -valarray, I___);
                 valarray = -valarray;
+            case 'TeLEx'
+                if(I___(end)~=inf)
+                    time_values = [time_values time_values(end)+I___(end)];
+                    valarray = [valarray valarray(end)];
+                end
+                [time_values, valarray] = RobustEv(time_values, -valarray, I___);
+                valarray = TeLExExpand(TeLEx_gamma, I___(1), I___(end))*(-valarray);
             case 'add'
                 %[time_values, valarray] = RobustAvEvRight(time_values, -valarray, I___);
                 %valarray = -valarray;
@@ -331,6 +356,13 @@ switch(phi.type)
                     valarray1 = [valarray1 valarray1(end)];
                 end
                 [time_values, valarray] = RobustEv(time_values1, valarray1, I___);
+            case 'TeLEx'
+                if(I___(end)~=inf)
+                    time_values1 = [time_values1 time_values1(end)+I___(end)];
+                    valarray1 = [valarray1 valarray1(end)];
+                end
+                [time_values, valarray] = RobustEv(time_values1, valarray1, I___);
+                valarray = TeLExContract(gamma, I___(1), I___(end)) * valarray;
             case 'add'
                 [time_values, valarray] = RobustAlways(time_values1, -valarray1, I___);
                 valarray = -valarray;
@@ -448,6 +480,10 @@ switch(phi.type)
             valarray2 = [valarray2 valarray2(end)];
         end
         [time_values, valarray] = RobustUntil(time_values1, valarray1, time_values2, valarray2, I___);
+        switch phi.semantics
+            case 'TeLEx'
+                valarray = valarray * TeLExExpand(TeLEx_gamma, I___(1), I___(end));
+        end
 end
 
 %%  Sanity checks

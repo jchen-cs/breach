@@ -18,8 +18,7 @@ SysFalsify.SetInputGen(InputGen);
 AboveZero = STL_Formula('AboveZero', 'alw(ModelOut[t] > 0)');
 
 Time = 0:0.05:10;
-global iterations;
-iterations = 0;
+
 
 SysFalsify.SetParamRanges({'ModelIn_u0'}, [-0.1 1]);
 req = BreachRequirement(AboveZero);
@@ -28,7 +27,6 @@ falsify = FalsificationProblem(SysFalsify, req);
 %falsify.solver = 'simulated_annealing'
 %falsify.startSample = []
 falsify.solve();
-fprintf('%d iterations\n', round(iterations))
 
 cex = falsify.GetFalse();
 cex.PlotSignals({'ModelIn', 'ModelOut'});

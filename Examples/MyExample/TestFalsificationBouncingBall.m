@@ -18,8 +18,7 @@ SysFalsify.SetInputGen(InputGen);
 SpeedLimit = STL_Formula('VelocityBelow20', 'alw((Velocity[t] < 20) & (Velocity[t] > -20))');
 
 Time = 0:0.05:10;
-global iterations;
-iterations = 0;
+
 
 SysFalsify.SetParamRanges({'InitialPosition_u0'}, [0 10]);
 req = BreachRequirement(SpeedLimit);
@@ -28,7 +27,6 @@ falsify = FalsificationProblem(SysFalsify, req);
 %falsify.solver = 'simulated_annealing'
 %falsify.startSample = []
 falsify.solve();
-fprintf('%d iterations\n', round(iterations))
 
 cex = falsify.GetFalse();
 cex.PlotSignals({'Position', 'Velocity'});
