@@ -98,7 +98,7 @@ for ii=1:numTrajs % we loop on every traj in case we check more than one
         else
             interval = [t(1) t(end)];
         end
-        [val, time_values] = GetValues(Sys, phi, Pii, traj, partition, relabs, interval);
+        [val, time_values, ~ , ~] = GetValues(Sys, phi, Pii, traj, partition, relabs, interval);
         
         try
  %           if(numel(t)==1) % we handle singular times
@@ -115,7 +115,7 @@ for ii=1:numTrajs % we loop on every traj in case we check more than one
         end
     else
         interval = [0 traj.time(1,end)];
-        [val__ii, time_values__ii] = GetValues(Sys, phi, Pii, traj, partition, relabs, interval);
+        [val__ii, time_values__ii, ~ , ~] = GetValues(Sys, phi, Pii, traj, partition, relabs, interval);
         
         val__{ii} = val__ii(time_values__ii<=traj.time(1,end));
         time_values__{ii} = time_values__ii(time_values__ii<=traj.time(1,end));
@@ -141,7 +141,7 @@ end
 end
 %%
 
-function [valarray, time_values_P, time_values_N] = GetValues(Sys, phi, P, traj, partition, relabs, interval)
+function [valarray, time_values, time_values_P, time_values_N] = GetValues(Sys, phi, P, traj, partition, relabs, interval)
 global BreachGlobOpt;
 eval(BreachGlobOpt.GlobVarsDeclare);
 
@@ -195,12 +195,12 @@ switch(phi.type)
     
         
     case 'not'
-        [valarray, time_values] = GetValues(Sys, phi.phi, P, traj, partition, relabs, interval);
+        [valarray, time_values, ~ , ~] = GetValues(Sys, phi.phi, P, traj, partition, relabs, interval);
         valarray = - valarray;
         
     case 'or'
-        [valarray1, time_values1] = GetValues(Sys, phi.phi1, P, traj, partition, relabs, interval);
-        [valarray2, time_values2] = GetValues(Sys, phi.phi2, P, traj, partition, relabs, interval);
+        [valarray1, time_values1, ~ , ~] = GetValues(Sys, phi.phi1, P, traj, partition, relabs, interval);
+        [valarray2, time_values2, ~ , ~] = GetValues(Sys, phi.phi2, P, traj, partition, relabs, interval);
         switch phi.semantics
             case 'max'
                 [time_values, valarray] = RobustOr(time_values1, valarray1, time_values2, valarray2);
@@ -229,8 +229,8 @@ switch(phi.type)
         % replace later (something like a container of SemanticOperators
         % for each of the binary functions (alpha, beta, zeta, eta) and the
         % time integrators (Gamma, Delta, Theta, Xi)
-        [valarray1, time_values1] = GetValues(Sys, phi.phi1, P, traj, partition, relabs, interval);
-        [valarray2, time_values2] = GetValues(Sys, phi.phi2, P, traj, partition, relabs, interval);
+        [valarray1, time_values1, ~ , ~] = GetValues(Sys, phi.phi1, P, traj, partition, relabs, interval);
+        [valarray2, time_values2, ~ , ~] = GetValues(Sys, phi.phi2, P, traj, partition, relabs, interval);
         % JOHAN CHANGE
         switch phi.semantics
             case 'max'
@@ -261,13 +261,13 @@ switch(phi.type)
         valarray = cell(1,n_phi);
         time_values = cell(1,n_phi);
         for ii=1:n_phi
-            [valarray{ii},time_values{ii}] = GetValues(Sys, phi.phin(ii), P, traj, partition, relabs, interval);
+            [valarray{ii},time_values{ii}, ~ , ~] = GetValues(Sys, phi.phin(ii), P, traj, partition, relabs, interval);
         end
         [time_values, valarray] = RobustAndn(time_values,valarray);
         
     case '=>'
-        [valarray1, time_values1] = GetValues(Sys, phi.phi1, P, traj, partition, relabs, interval);
-        [valarray2, time_values2] = GetValues(Sys, phi.phi2, P, traj, partition, relabs, interval);
+        [valarray1, time_values1, ~ , ~] = GetValues(Sys, phi.phi1, P, traj, partition, relabs, interval);
+        [valarray2, time_values2, ~ , ~] = GetValues(Sys, phi.phi2, P, traj, partition, relabs, interval);
         valarray1 = -valarray1;
         
         switch phi.semantics
@@ -297,7 +297,7 @@ switch(phi.type)
         I___ = max([I___; 0 0]);
         I___(1) = min(I___(1), I___(2));
         next_interval = I___+interval;
-        [valarray, time_values] = GetValues(Sys, phi.phi, P, traj, partition, relabs, next_interval);
+        [valarray, time_values, ~ , ~] = GetValues(Sys, phi.phi, P, traj, partition, relabs, next_interval);
         
         % JOHAN FIX
         % valarray is EMPTY if the formula is "true". The valarray is
@@ -367,7 +367,7 @@ switch(phi.type)
         I___ = max([I___; 0 0]);
         I___(1) = min(I___(1), I___(2));
         next_interval = I___+interval;
-        [valarray1, time_values1] = GetValues(Sys, phi.phi, P, traj, partition, relabs, next_interval);
+        [valarray1, time_values1, ~ , ~] = GetValues(Sys, phi.phi, P, traj, partition, relabs, next_interval);
         if(I___(end)~=inf)
             time_values1 = [time_values1 time_values1(end)+I___(end)];
             valarray1 = [valarray1 valarray1(end)];
@@ -379,7 +379,7 @@ switch(phi.type)
         I___ = max([I___; 0 0]);
         I___(1) = min(I___(1), I___(2));
         next_interval = I___+interval;
-        [valarray1, time_values1] = GetValues(Sys, phi.phi, P, traj, partition, relabs, next_interval);
+        [valarray1, time_values1, ~ , ~] = GetValues(Sys, phi.phi, P, traj, partition, relabs, next_interval);
         
         switch phi.semantics
             case 'max'
@@ -427,7 +427,7 @@ switch(phi.type)
         next_interval = interval-[I___(1)+I___(2), I___(1)];
         next_interval(1) = max(0, next_interval(1));        
         
-        [valarray1, time_values1] = GetValues(Sys, phi.phi, P, traj, partition, relabs, next_interval);
+        [valarray1, time_values1, ~ , ~] = GetValues(Sys, phi.phi, P, traj, partition, relabs, next_interval);
         
         % Flipping time, taking into account constant interpolation with
         % previous 
@@ -466,7 +466,7 @@ switch(phi.type)
         next_interval = interval-[I___(1)+I___(2), I___(1)];
         next_interval(1) = max(0, next_interval(1));        
                 
-        [valarray1, time_values1] = GetValues(Sys, phi.phi, P, traj, partition, relabs, next_interval);   
+        [valarray1, time_values1, ~ , ~] = GetValues(Sys, phi.phi, P, traj, partition, relabs, next_interval);   
         
         % Flipping time, taking into account constant interpolation with
         % previous 
@@ -504,8 +504,8 @@ switch(phi.type)
         interval1 = [interval(1), I___(2)+interval(2)];
         interval2 = I___+interval;
         
-        [valarray1, time_values1] = GetValues(Sys, phi.phi1, P, traj, partition, relabs, interval1);
-        [valarray2, time_values2] = GetValues(Sys, phi.phi2, P, traj, partition, relabs, interval2);
+        [valarray1, time_values1, ~ , ~] = GetValues(Sys, phi.phi1, P, traj, partition, relabs, interval1);
+        [valarray2, time_values2, ~ , ~] = GetValues(Sys, phi.phi2, P, traj, partition, relabs, interval2);
         if(I___(end)~=inf)
             time_values1 = [time_values1 time_values1(end)+I___(end)];
             valarray1 = [valarray1 valarray1(end)];
