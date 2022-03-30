@@ -141,7 +141,7 @@ end
 end
 %%
 
-function [valarray, time_values] = GetValues(Sys, phi, P, traj, partition, relabs, interval)
+function [valarray, time_values_P, time_values_N] = GetValues(Sys, phi, P, traj, partition, relabs, interval)
 global BreachGlobOpt;
 eval(BreachGlobOpt.GlobVarsDeclare);
 
@@ -517,6 +517,9 @@ switch(phi.type)
             case 'TeLEx'
                 valarray = valarray * TeLExExpand(TeLEx_gamma, I___(1), I___(end));
         end
+
+        time_values_P = max(time_values, 0);
+        time_values_N = min(time_values, 0);
 end
 
 %%  Sanity checks
