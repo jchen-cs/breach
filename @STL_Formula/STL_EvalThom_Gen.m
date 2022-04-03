@@ -528,9 +528,6 @@ switch(phi.type)
             case 'TeLEx'
                 valarray = valarray * TeLExExpand(TeLEx_gamma, I___(1), I___(end));
         end
-
-        valarray_P = max(valarray, 0);
-        valarray_N = min(valarray, 0);
 end
 
 %%  Sanity checks
@@ -551,7 +548,8 @@ if ~isempty(find(ibof, 1))
     valarray = interp1(time_ok, val_ok, time_values, 'nearest');
 end
 
-
+valarray_P = max(valarray, 0);
+valarray_N = min(valarray, 0);
 end
 
 function time_values = GetTimeValues(traj,interval)
