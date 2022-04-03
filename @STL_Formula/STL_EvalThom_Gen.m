@@ -1,4 +1,4 @@
-function [val__, time_values__] = STL_EvalThom_Gen(Sys, phi, P, trajs, partition, relabs, t)
+function [val_P__, val_N__, time_values__] = STL_EvalThom_Gen(Sys, phi, P, trajs, partition, relabs, t)
 %STL_EVALTHOM_GEN computes the satisfaction function of a property for one
 % or many trajectory(ies) with respect to a partition of signals. 
 % This function uses a variable time step robust
@@ -138,6 +138,9 @@ else
         time_values__ = cell2mat(time_values__);
     end
 end
+
+val_P__ = max(0, val__);
+val_N__ = min(0, val__);
 end
 %%
 
