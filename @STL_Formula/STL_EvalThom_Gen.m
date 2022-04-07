@@ -166,10 +166,6 @@ switch(phi.type)
             valarray = arrayfun(evalfn, time_values);
         end
         % valarray = robustness score at each time step
-        switch phi.semantics
-            case 'TeLEx'
-                valarray = TeLExPeak(TeLEx_beta, valarray); 
-        end
         sigs = STL_ExtractSignals(phi); % sigs = signals involved in phi
         switch relabs
             case 'rel'
@@ -194,8 +190,9 @@ switch(phi.type)
                     end
                 end
         end
-        valarray_P = max(0, valarray);
-        valarray_N = min(0, valarray);
+        valarray_P = nu(time_values, max(0, valarray), phi.semantics);
+        valarray_N = mu(time_values, min(0, valarray), phi.semantics);
+        
     
         
     case 'not'
@@ -534,16 +531,29 @@ end
 function res = nu(t, v, semantics)
     switch semantics
         case 'max-breach'
+            res = max(v, 0);
         case 'const-breach'
+            res = max(100*sign(v), 0);
         case 'plus-breach'
+            res = max(v, 0);
         case 'telex'
+            res = max(TeLExPeak(v), 0);
         case 'belta'
-        case 'pi-plus-1'
+            res = max(v, 0);
+        case 'agm-product'
+            res = max(v, 0);
         case 'sum-product'
+            res = max(v, 0);
         case 'sum-min'
+            res = max(v, 0);
         case 'max-product'
+            res = max(v, 0);
         case 'minonly'
+            res = max(v, 0);
         case 'smoothrect'
+            res = v;
+            res(res <= 0) = 0;
+            res(res > 0) = res .* exp(-1 ./ res);
         otherwise
             error('Unknown semantics for nu!');
     end
@@ -552,16 +562,29 @@ end
 function res = mu(t, v, semantics)
     switch semantics
         case 'max-breach'
+            res = min(v, 0);
         case 'const-breach'
+            res = min(-100*sign(v), 0);
         case 'plus-breach'
+            res = min(v, 0);
         case 'telex'
+            res = min(TeLExPeak(v), 0);
         case 'belta'
-        case 'pi-plus-1'
+            res = min(v, 0);
+        case 'agm-product'
+            res = min(v, 0);
         case 'sum-product'
+            res = min(v, 0);
         case 'sum-min'
+            res = min(v, 0);
         case 'max-product'
+            res = min(v, 0);
         case 'minonly'
+            res = min(v, 0);
         case 'smoothrect'
+            res = v;
+            res(res >= 0) = 0;
+            res(res < 0) = res .* exp(1 ./ res);
         otherwise
             error('Unknown semantics for mu!');
     end
@@ -570,16 +593,25 @@ end
 function res = alpha(t1, v1, t2, v2, semantics)
     switch semantics
         case 'max-breach'
+            res = min(v1, v2);
         case 'const-breach'
+            res = min(v1, v2);
         case 'plus-breach'
         case 'telex'
+            res = min(v1, v2);
         case 'belta'
-        case 'pi-plus-1'
+            res = min(v1, v2);
+        case 'agm-product'
         case 'sum-product'
+            res = v1 .* v2;
         case 'sum-min'
+            res = min(v1, v2);
         case 'max-product'
+            res = v1 .* v2;
         case 'minonly'
+            res = min(v1, v2);
         case 'smoothrect'
+            res = min(v1, v2);
         otherwise
             error('Unknown semantics for alpha!');
     end
@@ -588,16 +620,27 @@ end
 function res = beta(t1, v1, t2, v2, semantics)
     switch semantics
         case 'max-breach'
+            res = max(v1, v2);
         case 'const-breach'
+            res = max(v1, v2);
         case 'plus-breach'
+            
         case 'telex'
+            res = max(v1, v2);
         case 'belta'
-        case 'pi-plus-1'
+            res = max(v1, v2);
+        case 'agm-product'
+            res = max(v1, v2);
         case 'sum-product'
+            res = v1 + v2;
         case 'sum-min'
+            res = v1 + v2;
         case 'max-product'
+            res = max(v1, v2);
         case 'minonly'
+            res = min(v1, v2);
         case 'smoothrect'
+            res = max(v1, v2);
         otherwise
             error('Unknown semantics for beta!');
     end
@@ -606,16 +649,26 @@ end
 function res = zeta(a, b, semantics)
     switch semantics
         case 'max-breach'
+            res = min(v1, v2);
         case 'const-breach'
+            res = min(v1, v2);
         case 'plus-breach'
+            res = min(v1, v2);
         case 'telex'
+            res = min(v1, v2);
         case 'belta'
-        case 'pi-plus-1'
+            res = min(v1, v2);
+        case 'agm-product'
         case 'sum-product'
+            res = v1 .* v2;
         case 'sum-min'
+            res = min(v1, v2);
         case 'max-product'
+            res = v1 .* v2;
         case 'minonly'
+            res = min(v1, v2);
         case 'smoothrect'
+            res = min(v1, v2);
         otherwise
             error('Unknown semantics for zeta!');
     end
@@ -624,16 +677,27 @@ end
 function res = eta(a, b, semantics)
     switch semantics
         case 'max-breach'
+            res = max(v1, v2);
         case 'const-breach'
+            res = max(v1, v2);
         case 'plus-breach'
+            res = max(v1, v2);
         case 'telex'
+            res = max(v1, v2);
         case 'belta'
-        case 'pi-plus-1'
+            res = max(v1, v2);
+        case 'agm-product'
+            res = max(v1, v2);
         case 'sum-product'
+            res = v1 + v2;
         case 'sum-min'
+            res = v1 + v2;
         case 'max-product'
+            res = max(v1, v2);
         case 'minonly'
+            res = min(v1, v2);
         case 'smoothrect'
+            res = max(v1, v2);
         otherwise
             error('Unknown semantics for eta!');
     end
@@ -642,16 +706,27 @@ end
 function res = Gamma(t, v, semantics)
     switch semantics
         case 'max-breach'
+            res = max(v);
         case 'const-breach'
+            res = max(v);
         case 'plus-breach'
+            res = max(v);
         case 'telex'
+            res = TeLEXExpand(max(v));
         case 'belta'
-        case 'pi-plus-1'
+            res = sum(v);
+        case 'agm-product'
+            res = max(v);
         case 'sum-product'
+            res = sum(v);
         case 'sum-min'
+            res = sum(v);
         case 'max-product'
+            res = max(v);
         case 'minonly'
+            res = min(v);
         case 'smoothrect'
+            res = max(v);
         otherwise
             error('Unknown semantics for Gamma!');
     end
@@ -660,16 +735,26 @@ end
 function res = Delta(t, v, semantics)
     switch semantics
         case 'max-breach'
+            res = min(v);
         case 'const-breach'
+            res = min(v);
         case 'plus-breach'
+            res = min(v);
         case 'telex'
+            res = min(v);
         case 'belta'
-        case 'pi-plus-1'
+            res = min(v);
+        case 'agm-product'
         case 'sum-product'
+            res = prod(v);
         case 'sum-min'
+            res = min(v);
         case 'max-product'
+            res = prod(v);
         case 'minonly'
+            res = min(v);
         case 'smoothrect'
+            res = min(v);
         otherwise
             error('Unknown semantics for Delta!');
     end
@@ -678,16 +763,26 @@ end
 function res = Theta(t, v, semantics)
     switch semantics
         case 'max-breach'
+            res = min(v);
         case 'const-breach'
+            res = min(v);
         case 'plus-breach'
+            res = min(v);
         case 'telex'
+            res = min(v);
         case 'belta'
-        case 'pi-plus-1'
+            res = min(v);
+        case 'agm-product'
         case 'sum-product'
+            res = prod(v);
         case 'sum-min'
+            res = min(v);
         case 'max-product'
+            res = prod(v);
         case 'minonly'
+            res = min(v);
         case 'smoothrect'
+            res = min(v);
         otherwise
             error('Unknown semantics for Theta!');
     end
@@ -696,16 +791,27 @@ end
 function res = Xi(t, v, semantics)
     switch semantics
         case 'max-breach'
+            res = max(v);
         case 'const-breach'
+            res = max(v);
         case 'plus-breach'
+            res = max(v);
         case 'telex'
+            res = TeLEXExpand(max(v));
         case 'belta'
+            res = max(v);
         case 'pi-plus-1'
-        case 'sum-product'
+            res = max(v);
+        case 'agm-product'
+            res = sum(v);
         case 'sum-min'
+            res = sum(v);
         case 'max-product'
+            res = max(v);
         case 'minonly'
+            res = min(v);
         case 'smoothrect'
+            res = max(v);
         otherwise
             error('Unknown semantics for Xi!');
     end
