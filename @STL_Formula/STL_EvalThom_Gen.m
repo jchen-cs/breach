@@ -199,9 +199,9 @@ switch(phi.type)
     
         
     case 'not'
-        [valarray_P, valarray_N, time_values] = GetValues(Sys, phi.phi, P, traj, partition, relabs, interval);
-        valarray_P = -valarray_N;
-        valarray_N = -valarray_P;
+        [P, N, time_values] = GetValues(Sys, phi.phi, P, traj, partition, relabs, interval);
+        valarray_P = -N;
+        valarray_N = -P;
         
     case 'or'
         [valarray_P1, valarray_N1, time_values1] = GetValues(Sys, phi.phi1, P, traj, partition, relabs, interval);
@@ -220,7 +220,7 @@ switch(phi.type)
         [t, P1, P2] = matchTraces(time_values1, time_values2, valarray_P1, valarray_P2);
         [~, N1, N2] = matchTraces(time_values1, time_values2, valarray_N1, valarray_N2);
         valarray_P = alpha(P1, t, P2, t, phi.semantics);
-        valarray_N = beta(N1, t, N2, t, phi.semantics);
+        valarray_N = -beta(-N1, t, -N2, t, phi.semantics);
         time_values = t;
         
         
@@ -241,21 +241,31 @@ switch(phi.type)
         [valarray_P2, valarray_N2, time_values2] = GetValues(Sys, phi.phi2, P, traj, partition, relabs, interval);
         [t, P1, P2] = matchTraces(time_values1, time_values2, valarray_P1, valarray_P2);
         [~, N1, N2] = matchTraces(time_values1, time_values2, valarray_N1, valarray_N2);
-        valarray_P = alpha(P1, t, -N2, t, phi.semantics);
-        valarray_N = beta(N1, t, -P2, t, phi.semantics);
+        valarray_P = beta(-N1, t, P2, t, phi.semantics);
+        valarray_N = -alpha(P1, t, -N2, t, phi.semantics);
         time_values = t;
         
         
     case 'always'
+        % Using the equivalence G \phi = ~F(~\phi) = ~(T U ~\phi)
         I___ = eval(phi.interval);
         I___ = max([I___; 0 0]);
         I___(1) = min(I___(1), I___(2));
-        next_interval = I___+interval;
-        [valarray_P, valarray_N, time_values] = GetValues(Sys, phi.phi, P, traj, partition, relabs, next_interval);
-        valarray = valarray_P + valarray_N;
-        
+        % Interval of first predicate is from beginning of robustness
+        % interval to the end, plus the Until operator's time horizon
+        interval1 = [interval(1), I___(2)+interval(2)];
+        interval2 = I___+interval;
 
+        % True is infinite positive robustness, zero negative robustness
+        valarray_P1 = inf(size(interval1));
+        valarray_N1 = zeros(size(interval1));
+        time_values1 = interval1;
         
+        [valarray_P2, valarray_N2, time_values2] = GetValues(Sys, phi.phi, P, traj, partition, relabs, interval2); 
+        [time_values, valarray_P_until, valarray_N_until] = PlusMinusUntil(time_values1, valarray_P1, valarray_N1, time_values2, -valarray_N2, -valarray_P2, I___);
+        valarray_P = -valarray_N_until;
+        valarray_N = -valarray_P_until;
+       
 %     case 'av_eventually'
 %         I___ = eval(phi.interval);
 %         I___ = max([I___; 0 0]);
@@ -269,13 +279,24 @@ switch(phi.type)
 %         end
 %         [time_values, valarray] = RobustAvEvRight(time_values1, valarray1, I___);
         
-    case 'eventually'
+    case 'eventually' 
+        % Using the property that F \phi = T U \phi
+        % Get time horizon for the Until operator
         I___ = eval(phi.interval);
         I___ = max([I___; 0 0]);
         I___(1) = min(I___(1), I___(2));
-        next_interval = I___+interval;
-        [valarray_P1, valarray_N1, time_values1] = GetValues(Sys, phi.phi, P, traj, partition, relabs, next_interval);
-        valarray1 = valarray_P1 + valarray_N1;
+        % Interval of first predicate is from beginning of robustness
+        % interval to the end, plus the Until operator's time horizon
+        interval1 = [interval(1), I___(2)+interval(2)];
+        interval2 = I___+interval;
+
+        % True is infinite positive robustness, zero negative robustness
+        valarray_P1 = inf(size(interval1));
+        valarray_N1 = zeros(size(interval1));
+        time_values1 = interval1;
+        
+        [valarray_P2, valarray_N2, time_values2] = GetValues(Sys, phi.phi, P, traj, partition, relabs, interval2); 
+        [time_values, valarray_P, valarray_N] = PlusMinusUntil(time_values1, valarray_P1, valarray_N1, time_values2, valarray_P2, valarray_N2, I___);
         
         
 %     case 'once'
@@ -368,8 +389,10 @@ switch(phi.type)
 
         [valarray_P1, valarray_N1, time_values1] = GetValues(Sys, phi.phi1, P, traj, partition, relabs, interval1);
         [valarray_P2, valarray_N2, time_values2] = GetValues(Sys, phi.phi2, P, traj, partition, relabs, interval2);
-        [time_values, valarray_P, valarray_N] = PlusMinusUntil(valarray_P1, valarray_N1, time_values1, valarray_P2, valarray_N2, time_values2, I___);
+        [time_values, valarray_P, valarray_N] = PlusMinusUntil(time_values1, valarray_P1, valarray_N1, time_values2, valarray_P2, valarray_N2, I___);
 end
+
+valarray = valarray_P + valarray_N;
 
 %%  Sanity checks
 
@@ -444,7 +467,7 @@ end
 
 end
 
-function [time_values, valarray_P, valarray_N] = PlusMinusUntil(valarray_P1, valarray_N1, time_values1, valarray_P2, valarray_N2, time_values2, I___, semantics) 
+function [time_values, valarray_P, valarray_N] = PlusMinusUntil(time_values1, valarray_P1, valarray_N1, time_values2, valarray_P2, valarray_N2, I___, semantics) 
     % If time horizons are finite, duplicate the final values at the end.
     if(I___(end)~=inf)
         time_values1 = [time_values1 time_values1(end)+I___(end)];
@@ -466,7 +489,6 @@ function [time_values, valarray_P, valarray_N] = PlusMinusUntil(valarray_P1, val
 
     N = size(time_values, 2);
     for k = 1:N
-        fprintf("Iteration %d\n", k)
         current_time = time_values(k);
         time_start = current_time + I___(1);
         time_end = current_time + I___(2);
@@ -479,21 +501,30 @@ function [time_values, valarray_P, valarray_N] = PlusMinusUntil(valarray_P1, val
         zeta_times = zeros(1, idx_end - idx_start);
         eta_result = zeros(1, idx_end - idx_start);
         eta_times = zeros(1, idx_end - idx_start);
-        for k_doubleprime = idx_start:idx_end
-            psi_indices = k:k_doubleprime;
+        % k_plus_kprime represents k+k' in the semantics, or the indices of
+        % time within the Until interval (which is a positive offset from
+        % the current time index, k)
+        % Here we look at all possible times for phi to "activate" within
+        % the interval, and find the worst-case.
+        for k_plus_kprime = idx_start:idx_end
+            
+            % For psi Until phi (here, trace 1 Until trace 2), look at 
+            % psi's robustness from current time until the time phi takes 
+            % effect (k_plus_kprime)
+            psi_indices = k:k_plus_kprime;
 
-            % Delta integrates all of trace 1 between t(k) and t(k_prime)
+            % Delta integrates all of trace psi between t(k) and t(k_prime)
             delta_result = Delta(time_values_combined(psi_indices), interp1(time_values1, valarray_P1, time_values_combined(psi_indices), 'previous'), semantics);
             % Same for Xi but for negative robustness
             xi_result = Xi(time_values_combined(psi_indices), -interp1(time_values1, valarray_N1, time_values_combined(psi_indices), 'previous'), semantics);
 
             % Zeta integrates the result of Delta, as well as the
             % robustness value of trace 2 at k+k_prime
-            zeta_result(k_doubleprime - idx_start + 1) = zeta(interp1(time_values2, valarray_P2, time_values_combined(k_doubleprime), 'previous'), delta_result, semantics);
-            zeta_times(k_doubleprime - idx_start + 1) = time_values_combined(k_doubleprime);
+            zeta_result(k_plus_kprime - idx_start + 1) = zeta(interp1(time_values2, valarray_P2, time_values_combined(k_plus_kprime), 'previous'), delta_result, semantics);
+            zeta_times(k_plus_kprime - idx_start + 1) = time_values_combined(k_plus_kprime);
 
-            eta_result(k_doubleprime - idx_start + 1) = eta(-interp1(time_values2, valarray_N2, time_values_combined(k_doubleprime), 'previous'), xi_result, semantics);
-            eta_times(k_doubleprime - idx_start + 1) =  zeta_times(k_doubleprime - idx_start + 1;
+            eta_result(k_plus_kprime - idx_start + 1) = eta(-interp1(time_values2, valarray_N2, time_values_combined(k_plus_kprime), 'previous'), xi_result, semantics);
+            eta_times(k_plus_kprime - idx_start + 1) =  zeta_times(k_plus_kprime - idx_start + 1);
         end
         valarray_P(k) = Gamma(zeta_times, zeta_result, semantics);
         valarray_N(k) = -Theta(eta_times, eta_result, semantics);
