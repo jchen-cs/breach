@@ -49,36 +49,18 @@ classdef alw_monitor < stl_monitor
             % These function are in the Core/OutputGen folder. 
             time_values = t(idx);
             valarray = Xout(end,idx);
+            valarray_P2 = max(valarray, 0);
+            valarray_N2 = min(valarray, 0);
             I___ = [time_values(1) time_values(end)];
+            valarray_P1 = inf(size(I___));
+            valarray_N1 = zeros(size(I___));
+            time_values1 = I___;
             semantics = get_semantics(this.formula);
-            switch semantics
-                case 'max'
-                    v = min(valarray);
-                case 'TeLEx'
-                    v = TeLExExpand(TeLEx_gamma, I___(1), I___(end)) * min(valarray);
-                case 'add'
-                    %[time_values, valarray] = RobustAvEvRight(time_values, -valarray, I___);
-                    %valarray = -valarray;
-                    [~, val_output] = alw_monitor_RobustAlways(time_values, valarray, I___);
-                    v = val_output(1);
-                case 'vbool_v1'
-                    %[time_values, valarray] = RobustAvEvRight(time_values, -valarray, I___);
-                    %valarray = -valarray;
-                    [~, val_output] = alw_monitor_RobustAlways_v1(time_values, valarray, I___);
-                    v = val_output(1);
-                case 'MARV'
-                    [~, val_output] = alw_monitor_MARV(time_values, valarray, I___);
-                    v = min(val_output);
-				case 'constant'
-                    standardVal = min(valarray);
-                    if standardVal >= 0
-                        v = 100;
-                    else
-                        v = -100;
-                    end
-                otherwise
-                    error('Unknown objective function!');
-            end
+            [~, valarray_P_until, valarray_N_until] = PlusMinusUntil(time_values1, valarray_P1, valarray_N1, time_values, -valarray_N2, -valarray_P2, I___, I___, semantics);
+            v = -valarray_P_until + -valarray_N_until;
+            v = v(1);
+            
+           
 
         end
         
