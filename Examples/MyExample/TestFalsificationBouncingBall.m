@@ -16,6 +16,7 @@ InputGen.SetParam({'InitialPosition_u0'}, [0]);
 SysFalsify.SetInputGen(InputGen);
 
 SpeedLimit = STL_Formula('VelocityBelow20', 'alw((Velocity[t] < 20) & (Velocity[t] > -20))');
+SpeedLimit = set_semantics(SpeedLimit, 'max-breach')
 
 Time = 0:0.05:10;
 

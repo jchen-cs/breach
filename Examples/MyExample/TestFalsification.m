@@ -19,7 +19,7 @@ AboveZero = STL_Formula('AboveZero', 'alw(ModelOut[t] > 0)');
 
 Time = 0:0.05:10;
 
-
+AboveZero = set_semantics(AboveZero, 'max-breach')
 SysFalsify.SetParamRanges({'ModelIn_u0'}, [-0.2 1]);
 req = BreachRequirement(AboveZero);
 
