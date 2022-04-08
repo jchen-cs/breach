@@ -39,4 +39,4 @@ for i=1:numel(semantics)
     results_iterations(i) = falsify.nb_obj_eval;
 end
 
-writematrix([semantics results_time results_iterations], 'results.csv');
+writematrix([["semantics" "time" "iterations"];[semantics' results_time' results_iterations']], 'results.csv');

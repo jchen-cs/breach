@@ -18,7 +18,7 @@ SysFalsify.SetParamRanges({'Velocity_u0', 'TurnRate_t1', 'TurnRate_u1'}, [0.1 3;
 phi = STL_Formula('phi', 'alw(Dist2Target[t] > 0.01)');
 
 %semantics = ["max", "add", "MARV", "constant", "TeLEx"];
-semantics = ["max-breach"];
+semantics = ["max-breach", "const-breach", "plus-breach", "belta", "sum-min", "smoothrect"];
 results_iterations = nan(1, numel(semantics));
 results_time = nan(1, numel(semantics));
 for i=1:numel(semantics)
@@ -30,6 +30,8 @@ for i=1:numel(semantics)
     results_time(i) = falsify.time_spent;
     results_iterations(i) = falsify.nb_obj_eval;
 end
+writematrix([["semantics" "time" "iterations"];[semantics' results_time' results_iterations']], 'results.csv');
+
 % 
 % cex = falsify.GetFalse();
 % cex.PlotSignals({'Velocity', 'TurnRate', 'Dist2Target'});
