@@ -10,9 +10,9 @@ function res = s_Xi(v, semantics, interval)
             res = TeLEXExpand(0.01, interval(1), interval(2)) .* max(v);
         case 'belta'
             res = max(v);
-        case 'pi-plus-1'
-            res = max(v);
         case 'agm-product'
+            res = max(v);
+        case 'sum-product'
             res = sum(v);
         case 'sum-min'
             res = sum(v);

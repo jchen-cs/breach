@@ -61,7 +61,7 @@ function [time_values, valarray_P, valarray_N] = PlusMinusUntil(time_values1, va
         case 'plus-breach'
             l_Gamma = @(v, interval)max(v);
         case 'telex'
-            l_Gamma = @(v, interval)(TeLEXExpand(0.01, interval(1), interval(2)) .* max(v));
+            l_Gamma = @(v, interval)(TeLExExpand(0.01, interval(1), interval(2)) .* max(v));
         case 'belta'
             l_Gamma = @(v, interval)sum(v);
         case 'agm-product'
@@ -92,7 +92,7 @@ function [time_values, valarray_P, valarray_N] = PlusMinusUntil(time_values1, va
         case 'belta'
             l_Delta = @(v)min(v);
         case 'agm-product'
-            l_Delta = @(v)prod(v+1)-1;
+            l_Delta = @(v)(prod(v+1)-1);
         case 'sum-product'
             l_Delta = @(v)prod(v);
         case 'sum-min'
@@ -115,12 +115,12 @@ function [time_values, valarray_P, valarray_N] = PlusMinusUntil(time_values1, va
         case 'plus-breach'
             l_Xi = @(v, interval)max(v);
         case 'telex'
-            l_Xi = @(v, interval)(TeLEXExpand(0.01, interval(1), interval(2)) .* max(v));
+            l_Xi = @(v, interval)(TeLExExpand(0.01, interval(1), interval(2)) .* max(v));
         case 'belta'
             l_Xi = @(v, interval)max(v);
-        case 'pi-plus-1'
-            l_Xi = @(v, interval)max(v);
         case 'agm-product'
+            l_Xi = @(v, interval)max(v);
+        case 'sum-product'
             l_Xi = @(v, interval)sum(v);
         case 'sum-min'
             l_Xi = @(v, interval)sum(v);
@@ -146,7 +146,7 @@ function [time_values, valarray_P, valarray_N] = PlusMinusUntil(time_values1, va
         case 'belta'
             l_Theta = @(v)min(v);
         case 'agm-product'
-            l_Theta = @(v)prod(v+1)-1;
+            l_Theta = @(v)(prod(v+1)-1);
         case 'sum-product'
             l_Theta = @(v)prod(v);
         case 'sum-min'

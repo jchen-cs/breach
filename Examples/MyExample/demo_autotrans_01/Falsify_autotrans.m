@@ -25,11 +25,12 @@ phi = STL_Formula('phi', 'alw_[0, 30] ((RPM[t] < 4500) & (Speed[t] < 120))');
 % cex = falsify.GetFalse();
 % cex.PlotSignals({'Throttle', 'Speed', 'RPM'});
 
-
-semantics = ["max", "add", "MARV", "constant", "TeLEx"];
+%"max-breach", "const-breach", "plus-breach", "telex", "belta", "agm-product", "sum-product", "sum-min", "max-product", "minonly","smoothrect"
+semantics = ["max-breach", "const-breach", "plus-breach", "belta", "sum-min", "smoothrect"];
 results_iterations = nan(1, numel(semantics));
 results_time = nan(1, numel(semantics));
 for i=1:numel(semantics)
+    semantics(i)
     phi_test = set_semantics(phi, semantics(i));
     req = BreachRequirement(phi_test);
     falsify = FalsificationProblem(SysFalsify, req);
@@ -38,3 +39,4 @@ for i=1:numel(semantics)
     results_iterations(i) = falsify.nb_obj_eval;
 end
 
+writematrix([semantics results_time results_iterations], 'results.csv');

@@ -23,7 +23,7 @@ function res = s_nu(t, v, semantics)
         case 'smoothrect'
             res = v;
             res(res <= 0) = 0;
-            res(res > 0) = res .* exp(-1 ./ res);
+            res(res > 0) = res(res > 0) .* exp(-1 ./ res(res > 0));
         otherwise
             error('Unknown semantics for nu!');
     end
