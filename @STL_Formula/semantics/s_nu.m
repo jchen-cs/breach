@@ -1,3 +1,9 @@
+% The nu function, which implements the rectifier for rho+
+% For a vector of robustness scores v and times t, compute the result of 
+% nu(v) according to the name of the semantics requested. 
+
+% nu is sound when nu(x) > 0 only if x > 0, and 0 otherwise.
+
 function res = s_nu(t, v, semantics)
     switch semantics
         case 'max-breach'

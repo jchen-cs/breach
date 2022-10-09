@@ -1,3 +1,14 @@
+% The Gamma function, which is the optimistic trace integrator typically 
+% used for UNTIL in rho+
+
+% That is, it takes the "best" score within a trace.
+
+% For a vector of robustness values v, compute Gamma(v) according to the 
+% name of the semantics requested.
+
+% Gamma is sound when, for robustness values x where all x >= 0, 
+% delta(x) > 0 only if there exists at least one x such that x > 0.
+
 function res = s_Gamma(v, semantics, interval)
     switch semantics
         case 'max-breach'

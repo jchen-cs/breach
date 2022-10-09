@@ -1,3 +1,14 @@
+% The Delta function, which is the pessimistic trace integrator typically 
+% used for UNTIL in rho+
+
+% That is, it takes the "worst" score within a trace.
+
+% For a vector of robustness values v, compute Delta(v) according to the 
+% name of the semantics requested.
+
+% Delta is sound when, for robustness values x where all x >= 0, 
+% Delta(x) > 0 only if all x > 0.
+
 function res = s_Delta(v, semantics)
     switch semantics
         case 'max-breach'

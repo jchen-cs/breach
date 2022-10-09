@@ -1,3 +1,14 @@
+% The alpha function, which is the pessimistic integrator typically used
+% for AND in rho+
+% That is, it takes the "worse" score of its two inputs.
+
+% For vectors of robustness values v1 and v2 for STL formulae phi1 and
+% phi2, compute alpha(v1, v2) according to the name of the semantics 
+% requested.
+
+% alpha is sound when, for x1 and x2 >= 0, alpha(x1, x2) > 0 only if 
+% x1 > 0 and x2 > 0. 0 otherwise.
+
 function res = s_alpha(v1, v2, semantics)
     switch semantics
         case 'max-breach'
