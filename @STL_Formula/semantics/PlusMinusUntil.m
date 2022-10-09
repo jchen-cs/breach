@@ -22,6 +22,10 @@ function [time_values, valarray_P, valarray_N] = PlusMinusUntil(time_values1, va
             l_zeta = @min;
         case 'smoothrect'
             l_zeta = @min;
+        case 'smooth1'
+            l_zeta = @safemult;
+        case 'smooth2'
+            l_zeta = @(v1, v2)(log(exp(v1) + exp(v2)));
         otherwise
             error('Unknown semantics for zeta!');
     end
@@ -49,6 +53,10 @@ function [time_values, valarray_P, valarray_N] = PlusMinusUntil(time_values1, va
             l_eta = @max;
         case 'smoothrect'
             l_eta = @max;
+        case 'smooth1'
+            l_eta = @(v1, v2)v1 + v2;
+        case 'smooth2'
+            l_eta = @(v1, v2)(log(exp(v1) + exp(v2)) / 2);
         otherwise
             error('Unknown semantics for eta!');
     end
@@ -76,6 +84,10 @@ function [time_values, valarray_P, valarray_N] = PlusMinusUntil(time_values1, va
             l_Gamma = @(v, interval)min(v);
         case 'smoothrect'
             l_Gamma = @(v, interval)max(v);
+        case 'smooth1'
+            l_Gamma = @(v, interval)sum(v);
+        case 'smooth2'
+            l_Gamma = @(v, interval)(log(mean(exp(v))));
         otherwise
             error('Unknown semantics for Gamma!');
     end
@@ -103,6 +115,10 @@ function [time_values, valarray_P, valarray_N] = PlusMinusUntil(time_values1, va
             l_Delta = @min;
         case 'smoothrect'
             l_Delta = @min;
+        case 'smooth1'
+            l_Delta = @safeprod;
+        case 'smooth2'
+            l_Delta = @(v)log(sum(exp(v)));
         otherwise
             error('Unknown semantics for Delta!');
     end
@@ -130,6 +146,10 @@ function [time_values, valarray_P, valarray_N] = PlusMinusUntil(time_values1, va
             l_Xi = @(v, interval)min(v);
         case 'smoothrect'
             l_Xi = @(v, interval)max(v);
+        case 'smooth1'
+            l_Xi = @(v, interval)sum(v);
+        case 'smooth2'
+            l_Xi = @(v, interval)(log(mean(exp(v))));
         otherwise
             error('Unknown semantics for Xi!');
     end
@@ -157,6 +177,10 @@ function [time_values, valarray_P, valarray_N] = PlusMinusUntil(time_values1, va
             l_Theta = @min;
         case 'smoothrect'
             l_Theta = @min;
+        case 'smooth1'
+            l_Theta = @safeprod;
+        case 'smooth2'
+            l_Theta = @(v)log(sum(exp(v)));
         otherwise
             error('Unknown semantics for Theta!');
     end

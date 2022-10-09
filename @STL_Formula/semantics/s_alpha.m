@@ -33,6 +33,10 @@ function res = s_alpha(v1, v2, semantics)
             res = min(v1, v2);
         case 'smoothrect'
             res = min(v1, v2);
+        case 'smooth1'
+            res = safemult(v1, v2);
+        case 'smooth2'
+            res = log(exp(v1) + exp(v2));
         otherwise
             error('Unknown semantics for alpha!');
     end
