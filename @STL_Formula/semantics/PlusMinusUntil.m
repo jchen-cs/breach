@@ -1,54 +1,54 @@
 function [time_values, valarray_P, valarray_N] = PlusMinusUntil(time_values1, valarray_P1, valarray_N1, time_values2, valarray_P2, valarray_N2, interval, I___, semantics) 
     switch semantics
         case 'max-breach'
-            l_zeta = @(v1, v2)min(v1, v2);
+            l_zeta = @min;
         case 'const-breach'
-            l_zeta = @(v1, v2)min(v1, v2);
+            l_zeta = @min;
         case 'plus-breach'
-            l_zeta = @(v1, v2)min(v1, v2);
+            l_zeta = @min;
         case 'telex'
-            l_zeta = @(v1, v2)min(v1, v2);
+            l_zeta = @min;
         case 'belta'
-            l_zeta = @(v1, v2)min(v1, v2);
+            l_zeta = @min;
         case 'agm-product'
-            l_zeta = @(v1, v2)((1+v1).*(1+v2))-1;
+            l_zeta = @(v1, v2)(safemult((1+v1),(1+v2)))-1;
         case 'sum-product'
-            l_zeta = @(v1, v2)(v1 .* v2);
+            l_zeta = @safemult;
         case 'sum-min'
-            l_zeta = @(v1, v2)min(v1, v2);
+            l_zeta = @min;
         case 'max-product'
-            l_zeta = @(v1, v2)(v1 .* v2);
+            l_zeta = @safemult;
         case 'minonly'
-            l_zeta = @(v1, v2)min(v1, v2);
+            l_zeta = @min;
         case 'smoothrect'
-            l_zeta = @(v1, v2)min(v1, v2);
+            l_zeta = @min;
         otherwise
             error('Unknown semantics for zeta!');
     end
     
     switch semantics
         case 'max-breach'
-            l_eta = @(v1, v2)max(v1, v2);
+            l_eta = @max;
         case 'const-breach'
-            l_eta = @(v1, v2)max(v1, v2);
+            l_eta = @max;
         case 'plus-breach'
-            l_eta = @(v1, v2)max(v1, v2);
+            l_eta = @max;
         case 'telex'
-            l_eta = @(v1, v2)max(v1, v2);
+            l_eta = @max;
         case 'belta'
-            l_eta = @(v1, v2)max(v1, v2);
+            l_eta = @max;
         case 'agm-product'
-            l_eta = @(v1, v2)max(v1, v2);
+            l_eta = @max;
         case 'sum-product'
             l_eta = @(v1, v2)v1 + v2;
         case 'sum-min'
             l_eta = @(v1, v2)v1 + v2;
         case 'max-product'
-            l_eta = @(v1, v2)max(v1, v2);
+            l_eta = @max;
         case 'minonly'
-            l_eta = @(v1, v2)min(v1, v2);
+            l_eta = @max;
         case 'smoothrect'
-            l_eta = @(v1, v2)max(v1, v2);
+            l_eta = @max;
         otherwise
             error('Unknown semantics for eta!');
     end
@@ -61,7 +61,7 @@ function [time_values, valarray_P, valarray_N] = PlusMinusUntil(time_values1, va
         case 'plus-breach'
             l_Gamma = @(v, interval)max(v);
         case 'telex'
-            l_Gamma = @(v, interval)(TeLExExpand(0.01, interval(1), interval(2)) .* max(v));
+            l_Gamma = @(v, interval)(safemult(TeLExExpand(0.01, interval(1), interval(2)), max(v)));
         case 'belta'
             l_Gamma = @(v, interval)sum(v);
         case 'agm-product'
@@ -82,27 +82,27 @@ function [time_values, valarray_P, valarray_N] = PlusMinusUntil(time_values1, va
     
     switch semantics
         case 'max-breach'
-            l_Delta = @(v)min(v);
+            l_Delta = @min;
         case 'const-breach'
-            l_Delta = @(v)min(v);
+            l_Delta = @min;
         case 'plus-breach'
-            l_Delta = @(v)min(v);
+            l_Delta = @min;
         case 'telex'
-            l_Delta = @(v)min(v);
+            l_Delta = @min;
         case 'belta'
-            l_Delta = @(v)min(v);
+            l_Delta = @min;
         case 'agm-product'
             l_Delta = @(v)(prod(v+1)-1);
         case 'sum-product'
-            l_Delta = @(v)prod(v);
+            l_Delta = @safeprod;
         case 'sum-min'
-            l_Delta = @(v)min(v);
+            l_Delta = @min;
         case 'max-product'
-            l_Delta = @(v)prod(v);
+            l_Delta = @safeprod;
         case 'minonly'
-            l_Delta = @(v)min(v);
+            l_Delta = @min;
         case 'smoothrect'
-            l_Delta = @(v)min(v);
+            l_Delta = @min;
         otherwise
             error('Unknown semantics for Delta!');
     end
@@ -115,7 +115,7 @@ function [time_values, valarray_P, valarray_N] = PlusMinusUntil(time_values1, va
         case 'plus-breach'
             l_Xi = @(v, interval)max(v);
         case 'telex'
-            l_Xi = @(v, interval)(TeLExExpand(0.01, interval(1), interval(2)) .* max(v));
+            l_Xi = @(v, interval)(safemult(TeLExExpand(0.01, interval(1), interval(2)), max(v)));
         case 'belta'
             l_Xi = @(v, interval)max(v);
         case 'agm-product'
@@ -136,27 +136,27 @@ function [time_values, valarray_P, valarray_N] = PlusMinusUntil(time_values1, va
     
     switch semantics
         case 'max-breach'
-            l_Theta = @(v)min(v);
+            l_Theta = @min;
         case 'const-breach'
-            l_Theta = @(v)min(v);
+            l_Theta = @min;
         case 'plus-breach'
-            l_Theta = @(v)min(v);
+            l_Theta = @min;
         case 'telex'
-            l_Theta = @(v)min(v);
+            l_Theta = @min;
         case 'belta'
-            l_Theta = @(v)min(v);
+            l_Theta = @min;
         case 'agm-product'
             l_Theta = @(v)(prod(v+1)-1);
         case 'sum-product'
-            l_Theta = @(v)prod(v);
+            l_Theta = @safeprod;
         case 'sum-min'
-            l_Theta = @(v)min(v);
+            l_Theta = @min;
         case 'max-product'
-            l_Theta = @(v)prod(v);
+            l_Theta = @safeprod;
         case 'minonly'
-            l_Theta = @(v)min(v);
+            l_Theta = @min;
         case 'smoothrect'
-            l_Theta = @(v)min(v);
+            l_Theta = @min;
         otherwise
             error('Unknown semantics for Theta!');
     end
@@ -208,7 +208,7 @@ function [time_values, valarray_P, valarray_N] = PlusMinusUntil(time_values1, va
             % zeta integrates the result of Delta, as well as the
             % robustness value of trace 2 at k+k_prime
             zeta_result(k_plus_kprime - idx_start + 1) = l_zeta(P2(k_plus_kprime), l_Delta(P1(psi_indices)));
-            eta_result(k_plus_kprime - idx_start + 1) = l_eta(-N2(k_plus_kprime), l_Xi(-1.*N1(psi_indices), I___));
+            eta_result(k_plus_kprime - idx_start + 1) = l_eta(-N2(k_plus_kprime), l_Xi(-N1(psi_indices), I___));
             
         end
         
