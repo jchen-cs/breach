@@ -25,6 +25,7 @@ function [time_values, valarray_P, valarray_N] = PlusMinusUntil(time_values1, va
         case 'smooth1'
             l_zeta = @safemult;
         case 'smooth2'
+            % This seems to cause problems
             l_zeta = @(v1, v2)(log(exp(v1) + exp(v2)));
         otherwise
             error('Unknown semantics for zeta!');
@@ -44,9 +45,9 @@ function [time_values, valarray_P, valarray_N] = PlusMinusUntil(time_values1, va
         case 'agm-product'
             l_eta = @max;
         case 'sum-product'
-            l_eta = @(v1, v2)v1 + v2;
+            l_eta = @(v1, v2)(v1 + v2);
         case 'sum-min'
-            l_eta = @(v1, v2)v1 + v2;
+            l_eta = @(v1, v2)(v1 + v2);
         case 'max-product'
             l_eta = @max;
         case 'minonly'
@@ -54,7 +55,7 @@ function [time_values, valarray_P, valarray_N] = PlusMinusUntil(time_values1, va
         case 'smoothrect'
             l_eta = @max;
         case 'smooth1'
-            l_eta = @(v1, v2)v1 + v2;
+            l_eta = @(v1, v2)(v1 + v2);
         case 'smooth2'
             l_eta = @(v1, v2)(log(exp(v1) + exp(v2)) / 2);
         otherwise
@@ -87,7 +88,8 @@ function [time_values, valarray_P, valarray_N] = PlusMinusUntil(time_values1, va
         case 'smooth1'
             l_Gamma = @(v, interval)sum(v);
         case 'smooth2'
-            l_Gamma = @(v, interval)(log(mean(exp(v))));
+            %l_Gamma = @(v, interval)(log(mean(exp(v))));
+            l_Gamma = @(v, interval)sum(v);
         otherwise
             error('Unknown semantics for Gamma!');
     end

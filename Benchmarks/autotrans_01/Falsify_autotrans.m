@@ -26,7 +26,8 @@ phi = STL_Formula('phi', 'alw_[0, 30] ((RPM[t] < 4500) & (Speed[t] < 120))');
 % cex.PlotSignals({'Throttle', 'Speed', 'RPM'});
 
 %"max-breach", "const-breach", "plus-breach", "telex", "belta", "agm-product", "sum-product", "sum-min", "max-product", "minonly","smoothrect"
-semantics = ["max-breach", "const-breach", "plus-breach", "belta", "sum-min", "smoothrect"];
+%semantics = ["max-breach", "const-breach", "plus-breach", "belta", "sum-min", "smoothrect", "smooth1", "smooth2"];
+semantics = ["smooth1"];
 results_iterations = nan(1, numel(semantics));
 results_time = nan(1, numel(semantics));
 for i=1:numel(semantics)

@@ -18,7 +18,8 @@ SysFalsify.SetParamRanges({'Velocity_u0', 'TurnRate_t1', 'TurnRate_u1'}, [0.1 3;
 phi = STL_Formula('phi', 'alw(Dist2Target[t] > 0.01)');
 
 %semantics = ["max", "add", "MARV", "constant", "TeLEx"];
-semantics = ["max-breach", "const-breach", "plus-breach", "belta", "sum-min", "smoothrect"];
+%semantics = ["max-breach", "const-breach", "plus-breach", "belta", "sum-min", "smoothrect"];
+semantics = ["sum-product"];
 results_iterations = nan(1, numel(semantics));
 results_time = nan(1, numel(semantics));
 for i=1:numel(semantics)

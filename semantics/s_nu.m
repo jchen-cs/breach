@@ -33,7 +33,7 @@ function res = s_nu(t, v, semantics)
         case 'smooth1'
             res = max(v .* exp(-1 ./ v), 0);
         case 'smooth2'
-            res = -max(-v .* exp(1 ./ v), 0);
+            res = max(v .* exp(-1 ./ v), 0);
         otherwise
             error('Unknown semantics for nu!');
     end
