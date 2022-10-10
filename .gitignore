@@ -41,3 +41,5 @@ docrun_backup.mat
 *.r2015a
 *_ert_rtw
 *.7z
+
+**/*.slxc
