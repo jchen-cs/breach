@@ -15,7 +15,8 @@ function res = s_mu(t, v, semantics)
         case 'telex'
             res = min(TeLExPeak(v, 1), 0);
         case 'belta'
-            res = min(v, 0);
+            % beta arbitrarily chosen as 10
+            res = -(1/10)*log(1+exp(v*-10));
         case 'agm-product'
             res = min(v, 0);
         case 'sum-product'

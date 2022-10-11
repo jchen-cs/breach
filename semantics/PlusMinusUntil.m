@@ -51,7 +51,7 @@ function [time_values, valarray_P, valarray_N] = PlusMinusUntil(time_values1, va
         case 'max-product'
             l_eta = @max;
         case 'minonly'
-            l_eta = @max;
+            l_eta = @min;
         case 'smoothrect'
             l_eta = @max;
         case 'smooth1'
@@ -106,7 +106,7 @@ function [time_values, valarray_P, valarray_N] = PlusMinusUntil(time_values1, va
         case 'belta'
             l_Delta = @min;
         case 'agm-product'
-            l_Delta = @(v)(prod(v+1)-1);
+            l_Delta = @(v)(safeprod(v+1)-1);
         case 'sum-product'
             l_Delta = @safeprod;
         case 'sum-min'
@@ -168,7 +168,7 @@ function [time_values, valarray_P, valarray_N] = PlusMinusUntil(time_values1, va
         case 'belta'
             l_Theta = @min;
         case 'agm-product'
-            l_Theta = @(v)(prod(v+1)-1);
+            l_Theta = @(v)(safeprod(v+1)-1);
         case 'sum-product'
             l_Theta = @safeprod;
         case 'sum-min'
@@ -208,13 +208,19 @@ function [time_values, valarray_P, valarray_N] = PlusMinusUntil(time_values1, va
     valarray_P = zeros(size(time_values));
     valarray_N = zeros(size(time_values));
     N = size(time_values, 2);
+    assert(all(valarray_P1 >= 0));
+    assert(all(valarray_P2 >= 0));
+    assert(all(valarray_N1 <= 0));
+    assert(all(valarray_N2 <= 0));
+    assert(all(~((valarray_P1 > 0) & (valarray_N1 < 0))))
+    assert(all(~((valarray_P2 > 0) & (valarray_N2 < 0))))
     parfor k = 1:N
         current_time = time_values(k);
         time_start = current_time + I___(1);
         time_end = current_time + I___(2);
         idx_start = find(time_values_combined >= time_start, 1);
         idx_end = find(time_values_combined >= time_end, 1);
-        % For each time inside the Until interval...
+        % For each time inside the Until interval starting from time at k: 
         zeta_result = zeros(1, idx_end - idx_start);
         eta_result = zeros(1, idx_end - idx_start);
         % k_plus_kprime represents k+k' in the semantics, or the indices of
@@ -242,5 +248,6 @@ function [time_values, valarray_P, valarray_N] = PlusMinusUntil(time_values1, va
     end
     assert(all(valarray_N <= 0))
     assert(all(valarray_P >= 0))
+    assert(all(~((valarray_P > 0) & (valarray_N < 0))))
     %size(valarray_P)
 end

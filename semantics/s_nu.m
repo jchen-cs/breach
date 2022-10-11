@@ -15,7 +15,8 @@ function res = s_nu(t, v, semantics)
         case 'telex'
             res = max(TeLExPeak(v, 1), 0);
         case 'belta'
-            res = max(v, 0);
+            % beta arbitrarily chosen as 10
+            res = (1/10)*log(1+exp(v*10));
         case 'agm-product'
             res = max(v, 0);
         case 'sum-product'
