@@ -196,7 +196,8 @@ function [time_values, valarray_P, valarray_N] = PlusMinusUntil(time_values1, va
         valarray_P2 = [valarray_P2 valarray_P2(end)];
         valarray_N2 = [valarray_N2 valarray_N2(end)];
     end
-
+    
+    % Length-match the traces
     [time_values_combined, P1, P2] = matchTraces(time_values1, time_values2, valarray_P1, valarray_P2);
     [~, N1, N2] = matchTraces(time_values1, time_values2, valarray_N1, valarray_N2);
     
@@ -207,7 +208,7 @@ function [time_values, valarray_P, valarray_N] = PlusMinusUntil(time_values1, va
     valarray_P = zeros(size(time_values));
     valarray_N = zeros(size(time_values));
     N = size(time_values, 2);
-    for k = 1:N
+    parfor k = 1:N
         current_time = time_values(k);
         time_start = current_time + I___(1);
         time_end = current_time + I___(2);
@@ -223,7 +224,6 @@ function [time_values, valarray_P, valarray_N] = PlusMinusUntil(time_values1, va
         % the interval, and find the worst-case.
         
         for k_plus_kprime = idx_start:idx_end
-            
             % For psi Until phi (here, trace 1 Until trace 2), look at 
             % psi's robustness from current time until the time phi takes 
             % effect (k_plus_kprime)
@@ -235,13 +235,12 @@ function [time_values, valarray_P, valarray_N] = PlusMinusUntil(time_values1, va
             % robustness value of trace 2 at k+k_prime
             zeta_result(k_plus_kprime - idx_start + 1) = l_zeta(P2(k_plus_kprime), l_Delta(P1(psi_indices)));
             eta_result(k_plus_kprime - idx_start + 1) = l_eta(-N2(k_plus_kprime), l_Xi(-N1(psi_indices), I___));
-            
         end
-        
         valarray_P(k) = l_Gamma(zeta_result, I___);
         valarray_N(k) = -l_Theta(eta_result);
         
     end
-    
+    assert(all(valarray_N <= 0))
+    assert(all(valarray_P >= 0))
     %size(valarray_P)
 end

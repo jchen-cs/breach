@@ -19,7 +19,7 @@ function res = s_beta(v1, v2, semantics)
         case 'const-breach'
             res = max(v1, v2);
         case 'plus-breach'
-            res = koenAndPlus(v1, v2);
+            res = -koenAndPlus(-v1, -v2);
         case 'telex'
             res = max(v1, v2);
         case 'belta'
@@ -39,8 +39,8 @@ function res = s_beta(v1, v2, semantics)
         case 'smooth1'
             res = v1 + v2;
         case 'smooth2'
-            %res = log(exp(v1) + exp(v2)) / 2;
-            res = v1 + v2;
+            res = log(exp(v1) + exp(v2)) / 2;
+            %res = v1 + v2;
         otherwise
             error('Unknown semantics for beta!');
     end

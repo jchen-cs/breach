@@ -36,8 +36,8 @@ function res = s_alpha(v1, v2, semantics)
         case 'smooth1'
             res = safemult(v1, v2);
         case 'smooth2'
-            %res = log(exp(v1) + exp(v2));
-            res = v1 + v2;
+            res = log(exp(v1) + exp(v2));
+            %res = v1 + v2;
         otherwise
             error('Unknown semantics for alpha!');
     end
