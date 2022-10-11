@@ -52,12 +52,21 @@ classdef alw_monitor < stl_monitor
             valarray_P2 = max(valarray, 0);
             valarray_N2 = min(valarray, 0);
             I___ = [time_values(1) time_values(end)];
+
+            % G phi = ~(T U ~phi)
+            % rho_+(G phi) = -rho_-(T U ~phi)
+            % rho_-(G phi) = -rho_+(T U ~phi)
+
+            % Trace 1 will be just True
             valarray_P1 = inf(size(I___));
             valarray_N1 = zeros(size(I___));
             time_values1 = I___;
             semantics = get_semantics(this.formula);
-            [~, valarray_P_until, valarray_N_until] = PlusMinusUntil(time_values1, valarray_P1, valarray_N1, time_values, -valarray_N2, -valarray_P2, I___, I___, semantics);
-            v = -valarray_P_until + -valarray_N_until;
+
+            [~, valarray_N_until, valarray_P_until] = PlusMinusUntil(time_values1, valarray_P1, valarray_N1, time_values, -valarray_N2, -valarray_P2, I___, I___, semantics);
+            valarray_N_until = -valarray_N_until;
+            valarray_P_until = -valarray_P_until;
+            v = valarray_P_until + valarray_N_until;
             v = v(1);
             
            
