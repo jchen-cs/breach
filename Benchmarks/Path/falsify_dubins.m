@@ -1,5 +1,10 @@
 clear; close all;
 
+filedatestring = datetime("now", 'format', 'yyyy-MM-dd_HHmmss-SSS');
+diary dubins.diary
+diary on
+fprintf("\n\n\n%s =====================================================\n", filedatestring)
+
 Sys = BreachSimulinkSystem('dubins');
 Sys.PrintSignals();
 SysFalsify = Sys.copy();
@@ -19,19 +24,20 @@ phi = STL_Formula('phi', 'alw(Dist2Target[t] > 0.01)');
 
 %semantics = ["max", "add", "MARV", "constant", "TeLEx"];
 %semantics = ["max-breach", "const-breach", "plus-breach", "belta", "sum-min", "smoothrect"];
-semantics = ["sum-product"];
+semantics = ["max-breach", "const-breach", "plus-breach", "telex", "belta", "sum-product", "sum-min", "max-product", "minonly", "smoothrect", "smooth1"];
 results_iterations = nan(1, numel(semantics));
 results_time = nan(1, numel(semantics));
 for i=1:numel(semantics)
     phi_test = set_semantics(phi, semantics(i));
     req = BreachRequirement(phi_test);
     falsify = FalsificationProblem(SysFalsify, req);
-    %falsify.max_obj_eval = 1000;
+    falsify.max_obj_eval = 500;
     falsify.solve();
     results_time(i) = falsify.time_spent;
     results_iterations(i) = falsify.nb_obj_eval;
 end
-writematrix([["semantics" "time" "iterations"];[semantics' results_time' results_iterations']], 'results.csv');
+diary off
+writematrix([["semantics" "time" "iterations"];[semantics' results_time' results_iterations']], sprintf('dubins_%s.csv', filedatestring));
 
 % 
 % cex = falsify.GetFalse();
