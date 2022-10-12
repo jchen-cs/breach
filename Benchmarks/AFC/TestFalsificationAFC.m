@@ -30,6 +30,7 @@ for i=1:numel(semantics)
     req = BreachRequirement(phi_test);
     %falsify = MaxSatProblem(SysFalsify, req);
     falsify = FalsificationProblem(SysFalsify, req);
+    falsify.max_obj_eval = 500;
     falsify.solve();
     results_time(i) = falsify.time_spent;
     results_iterations(i) = falsify.nb_obj_eval;

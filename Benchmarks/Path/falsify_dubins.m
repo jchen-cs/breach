@@ -28,6 +28,7 @@ semantics = ["max-breach", "const-breach", "plus-breach", "telex", "belta", "sum
 results_iterations = nan(1, numel(semantics));
 results_time = nan(1, numel(semantics));
 for i=1:numel(semantics)
+    semantics(i)
     phi_test = set_semantics(phi, semantics(i));
     req = BreachRequirement(phi_test);
     falsify = FalsificationProblem(SysFalsify, req);
