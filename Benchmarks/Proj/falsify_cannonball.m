@@ -23,7 +23,8 @@ phi = STL_Formula('phi', 'alw(((Y[t] < 0.5) and (Y[t] > 0)) => ((X[t] > 40.5) or
 
 
 %semantics = ["max", "add", "MARV", "constant", "TeLEx"];
-semantics = ["max-breach", "const-breach", "plus-breach", "telex", "belta", "sum-product", "sum-min", "max-product", "minonly", "smoothrect", "smooth1"];
+%semantics = ["max-breach", "const-breach", "plus-breach", "telex", "belta", "sum-product", "sum-min", "max-product", "minonly", "smoothrect", "smooth1"];
+semantics = ["smooth1"];
 results_iterations = nan(1, numel(semantics));
 results_time = nan(1, numel(semantics));
 for i=1:numel(semantics)

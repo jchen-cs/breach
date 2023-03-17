@@ -21,7 +21,8 @@ phi = AF_alw_ok;
 SysFalsify = AFC_Falsify;
 
 %semantics = ["max", "add", "MARV", "constant", "TeLEx"];
-semantics = ["max-breach", "const-breach", "plus-breach", "telex", "belta", "sum-product", "sum-min", "max-product", "minonly", "smoothrect", "smooth1"];
+%semantics = ["max-breach", "const-breach", "plus-breach", "telex", "belta", "sum-product", "sum-min", "max-product", "minonly", "smoothrect", "smooth1"];
+semantics = ["smooth2"];
 results_iterations = nan(1, numel(semantics));
 results_time = nan(1, numel(semantics));
 for i=1:numel(semantics)

@@ -32,9 +32,13 @@ function res = s_mu(t, v, semantics)
             res(res >= 0) = 0;
             res(res < 0) = res(res < 0) .* exp(1 ./ res(res < 0));
         case 'smooth1'
-            res = -max(-v .* exp(1 ./ v), 0);
+            res = v;
+            res(res >= 0) = 0;
+            res(res < 0) = res(res < 0) .* exp(1 ./ res(res < 0));
         case 'smooth2'
-            res = -max(-v .* exp(1 ./ v), 0);
+            res = v;
+            res(res >= 0) = 0;
+            res(res < 0) = res(res < 0) .* exp(1 ./ res(res < 0));
         otherwise
             error('Unknown semantics for mu!');
     end

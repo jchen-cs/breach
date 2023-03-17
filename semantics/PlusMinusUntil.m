@@ -26,7 +26,7 @@ function [time_values, valarray_P, valarray_N] = PlusMinusUntil(time_values1, va
             l_zeta = @safemult;
         case 'smooth2'
             % This seems to cause problems
-            l_zeta = @(v1, v2)(log(exp(v1) + exp(v2)));
+            l_zeta = @(v1, v2)(-log(exp(-v1) + exp(-v2)));
         otherwise
             error('Unknown semantics for zeta!');
     end
@@ -57,7 +57,7 @@ function [time_values, valarray_P, valarray_N] = PlusMinusUntil(time_values1, va
         case 'smooth1'
             l_eta = @(v1, v2)(v1 + v2);
         case 'smooth2'
-            l_eta = @(v1, v2)(log(exp(v1) + exp(v2)) / 2);
+            l_eta = @(v1, v2)log((exp(v1) + exp(v2))/2);
         otherwise
             error('Unknown semantics for eta!');
     end
@@ -88,8 +88,8 @@ function [time_values, valarray_P, valarray_N] = PlusMinusUntil(time_values1, va
         case 'smooth1'
             l_Gamma = @(v, interval)sum(v);
         case 'smooth2'
-            %l_Gamma = @(v, interval)(log(mean(exp(v))));
-            l_Gamma = @(v, interval)sum(v);
+            l_Gamma = @(v, interval)(log(mean(exp(v))));
+            %l_Gamma = @(v, interval)sum(v);
         otherwise
             error('Unknown semantics for Gamma!');
     end
@@ -120,7 +120,7 @@ function [time_values, valarray_P, valarray_N] = PlusMinusUntil(time_values1, va
         case 'smooth1'
             l_Delta = @safeprod;
         case 'smooth2'
-            l_Delta = @(v)log(sum(exp(v)));
+            l_Delta = @(v)(-log(sum(exp(-v))));
         otherwise
             error('Unknown semantics for Delta!');
     end
@@ -182,7 +182,7 @@ function [time_values, valarray_P, valarray_N] = PlusMinusUntil(time_values1, va
         case 'smooth1'
             l_Theta = @safeprod;
         case 'smooth2'
-            l_Theta = @(v)log(sum(exp(v)));
+            l_Theta = @(v)(-log(sum(exp(-v))));
         otherwise
             error('Unknown semantics for Theta!');
     end
@@ -214,7 +214,7 @@ function [time_values, valarray_P, valarray_N] = PlusMinusUntil(time_values1, va
     assert(all(valarray_N2 <= 0));
     assert(all(~((valarray_P1 > 0) & (valarray_N1 < 0))))
     assert(all(~((valarray_P2 > 0) & (valarray_N2 < 0))))
-    parfor k = 1:N
+    for k = 1:N
         current_time = time_values(k);
         time_start = current_time + I___(1);
         time_end = current_time + I___(2);
