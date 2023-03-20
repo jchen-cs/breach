@@ -1,0 +1,6 @@
+param t_start=0, t_end=20
+
+# Top, Left, Right, and Bottom edges of the obstacle
+
+param obs_t=6, obs_l=3, obs_r=6, obs_b=3
+no_collide := alw_[t_start, t_end] (not ((x[t] > obs_l) and (x[t] < obs_r) and (y[t] > obs_b) and (y[t] < obs_t)))
