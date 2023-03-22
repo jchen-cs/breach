@@ -10,26 +10,42 @@ STL_ReadFile('path2_spec.stl');
 Sys.PrintSignals();
 SysFalsify = Sys.copy();
 
-signal_gen = cp_signal_gen({'v', 'omega'}, [5; 5], 'previous');
+
+
+num_pts = 12;
+dt = 0.1;
+v_max = 1;
+v_min = 0;
+omega_max = 1;
+omega_min = -1;
+
+signal_gen = cp_signal_gen({'v', 'omega'}, [num_pts; num_pts], 'previous');
 InputGen = BreachSignalGen({signal_gen});
 Sys.PrintParams();
 
-
 SysFalsify.SetInputGen(InputGen);
-SysFalsify.SetParam({'v_t1', 'v_t2', 'v_t3', 'v_t4'}, [1 2 3 4]);
-SysFalsify.SetParam({'omega_t1', 'omega_t2', 'omega_t3', 'omega_t4'}, [1 2 3 4]);
-SysFalsify.SetParamRanges({'v_u0', 'v_u1', 'v_u2', 'v_u3', 'v_u4'}, [0 1]);
-SysFalsify.SetParamRanges({'omega_u0', 'omega_u1', 'omega_u2', 'omega_u3', 'omega_u4'}, [-1 1]);
+
+for i=1:(num_pts-1)
+    SysFalsify.SetParam(['v_t' num2str(i)], dt*i);
+    SysFalsify.SetParam(['omega_t' num2str(i)], dt*i);
+end
+
+for i=0:(num_pts-1)
+    SysFalsify.SetParamRanges(['v_u' num2str(i)], [v_min v_max]);
+    SysFalsify.SetParamRanges(['omega_u' num2str(i)], [omega_min omega_max]);
+end
+
+SysFalsify.PrintParams();
 
 
 phi = no_collide;
-global usegradient
-usegradient = false;
+%global usegradient
+%usegradient = false;
 
 %semantics = ["max", "add", "MARV", "constant", "TeLEx"];
 %semantics = ["max-breach", "const-breach", "plus-breach", "belta", "sum-min", "smoothrect"];
 %semantics = ["max-breach", "const-breach", "plus-breach", "telex", "belta", "sum-product", "sum-min", "max-product", "minonly", "smoothrect", "smooth1"];
-semantics = ["max-breach"];
+semantics = ["smooth2"];
 results_iterations = nan(1, numel(semantics));
 results_time = nan(1, numel(semantics));
 for i=1:numel(semantics)
@@ -37,7 +53,7 @@ for i=1:numel(semantics)
     phi_test = set_semantics(phi, semantics(i));
     req = BreachRequirement(phi_test);
     falsify = FalsificationProblem(SysFalsify, req);
-    falsify.max_obj_eval = 500;
+    falsify.max_obj_eval = 1000;
     falsify.solve();
     results_time(i) = falsify.time_spent;
     results_iterations(i) = falsify.nb_obj_eval;
