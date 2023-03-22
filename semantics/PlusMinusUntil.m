@@ -26,7 +26,8 @@ function [time_values, valarray_P, valarray_N] = PlusMinusUntil(time_values1, va
             l_zeta = @safemult;
         case 'smooth2'
             % This seems to cause problems
-            l_zeta = @(v1, v2)(-log(exp(-v1) + exp(-v2)));
+            %l_zeta = @(v1, v2)(-log(exp(-v1) + exp(-v2)));
+            l_zeta = @smooth2alpha;
         otherwise
             error('Unknown semantics for zeta!');
     end
@@ -120,7 +121,8 @@ function [time_values, valarray_P, valarray_N] = PlusMinusUntil(time_values1, va
         case 'smooth1'
             l_Delta = @safeprod;
         case 'smooth2'
-            l_Delta = @(v)(-log(sum(exp(-v))));
+            %l_Delta = @(v)(-log(sum(exp(-v))));
+            l_Delta = @(v)(1/log(mean(exp(1./v))));
         otherwise
             error('Unknown semantics for Delta!');
     end
@@ -182,7 +184,8 @@ function [time_values, valarray_P, valarray_N] = PlusMinusUntil(time_values1, va
         case 'smooth1'
             l_Theta = @safeprod;
         case 'smooth2'
-            l_Theta = @(v)(-log(sum(exp(-v))));
+            %l_Theta = @(v)(-log(sum(exp(-v))));
+            l_Theta = @(v)(1/log(mean(exp(1./v))));
         otherwise
             error('Unknown semantics for Theta!');
     end
@@ -214,7 +217,7 @@ function [time_values, valarray_P, valarray_N] = PlusMinusUntil(time_values1, va
     assert(all(valarray_N2 <= 0));
     assert(all(~((valarray_P1 > 0) & (valarray_N1 < 0))))
     assert(all(~((valarray_P2 > 0) & (valarray_N2 < 0))))
-    for k = 1:N
+    parfor k = 1:N
         current_time = time_values(k);
         time_start = current_time + I___(1);
         time_end = current_time + I___(2);
@@ -239,15 +242,25 @@ function [time_values, valarray_P, valarray_N] = PlusMinusUntil(time_values1, va
             
             % zeta integrates the result of Delta, as well as the
             % robustness value of trace 2 at k+k_prime
+            % This gives us lists of values, where the i-th value in each
+            % list corresponds to zeta/eta for each value of k'
             zeta_result(k_plus_kprime - idx_start + 1) = l_zeta(P2(k_plus_kprime), l_Delta(P1(psi_indices)));
             eta_result(k_plus_kprime - idx_start + 1) = l_eta(-N2(k_plus_kprime), l_Xi(-N1(psi_indices), I___));
         end
         valarray_P(k) = l_Gamma(zeta_result, I___);
-        valarray_N(k) = -l_Theta(eta_result);
+        valarray_N(k) = -l_Theta(eta_result); % Minus?
+
+        % Soundness check: Theta and Delta have the same requirements:
+        % If all x_k >= 0 and Delta(x_k) > 0 then \forall k. x_k > 0
+
+        assert(valarray_N(k) <= 0)
+        assert(valarray_P(k) >= 0)
         
     end
     assert(all(valarray_N <= 0))
     assert(all(valarray_P >= 0))
-    assert(all(~((valarray_P > 0) & (valarray_N < 0))))
+    % Assert that valarray_P and valarray_N are mutually exclusive, ie you
+    % can't have both be nonzero
+    assert(all(~((valarray_P ~= 0) & (valarray_N ~= 0))))
     %size(valarray_P)
 end
