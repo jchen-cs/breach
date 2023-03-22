@@ -59,6 +59,7 @@ classdef alw_monitor < stl_monitor
 
             % Trace 1 will be just True
             valarray_P1 = inf(size(I___));
+            %valarray_P1 = 500 * ones(size(I___));
             valarray_N1 = zeros(size(I___));
             time_values1 = I___;
             semantics = get_semantics(this.formula);

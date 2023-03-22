@@ -205,8 +205,14 @@ classdef BreachProblem < BreachStatus
                     case 4
                         this.ResetObjective(BrSet, params, ranges);
                 end
+
+                global usegradient
                 % setup default solver
-                this.setup_solver();
+                if usegradient
+                    this.setup_solver('fmincon');
+                else 
+                    this.setup_solver();
+                end
                 
                 % reset display
                 rfprintf_reset();
@@ -397,7 +403,8 @@ classdef BreachProblem < BreachStatus
             if this.verbose>=1
                 disp('Setting options for fmincon solver');
             end
-            solver_opt = optimoptions('fmincon', 'Display', 'iter');
+            
+            solver_opt = optimoptions('fmincon', 'Display', 'iter', 'Algorithm', 'sqp');
             this.display = 'off';
             if this.max_obj_eval < inf
                 solver_opt = optimoptions(solver_opt, 'MaxFunEvals', this.max_obj_eval);
