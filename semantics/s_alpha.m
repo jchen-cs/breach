@@ -20,7 +20,8 @@ function res = s_alpha(v1, v2, semantics)
         case 'telex'
             res = min(v1, v2);
         case 'belta'
-            res = min(v1, v2);
+            %res = min(v1, v2);
+            res = -beltamax(-v1, -v2);
         case 'agm-product'
             res = safemult((1+v1),(1+v2))-1;
         case 'sum-product'

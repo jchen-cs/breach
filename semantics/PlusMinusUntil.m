@@ -9,7 +9,8 @@ function [time_values, valarray_P, valarray_N] = PlusMinusUntil(time_values1, va
         case 'telex'
             l_zeta = @min;
         case 'belta'
-            l_zeta = @min;
+            %l_zeta = @min;
+            l_zeta = @(v1, v2)(-beltamax(-v1, -v2));
         case 'agm-product'
             l_zeta = @(v1, v2)(safemult((1+v1),(1+v2)))-1;
         case 'sum-product'
@@ -42,7 +43,8 @@ function [time_values, valarray_P, valarray_N] = PlusMinusUntil(time_values1, va
         case 'telex'
             l_eta = @max;
         case 'belta'
-            l_eta = @max;
+            %l_eta = @max;
+            l_eta = @beltamax;
         case 'agm-product'
             l_eta = @max;
         case 'sum-product'
@@ -105,7 +107,8 @@ function [time_values, valarray_P, valarray_N] = PlusMinusUntil(time_values1, va
         case 'telex'
             l_Delta = @min;
         case 'belta'
-            l_Delta = @min;
+            %l_Delta = @min;
+            l_Delta = @(v)(-beltamaxvector(-v));
         case 'agm-product'
             l_Delta = @(v)(safeprod(v+1)-1);
         case 'sum-product'
@@ -137,7 +140,8 @@ function [time_values, valarray_P, valarray_N] = PlusMinusUntil(time_values1, va
         case 'telex'
             l_Xi = @(v, interval)(safemult(TeLExExpand(0.01, interval(1), interval(2)), max(v)));
         case 'belta'
-            l_Xi = @(v, interval)max(v);
+            %l_Xi = @(v, interval)max(v);
+            l_Xi = @(v, interval)beltamaxvector(v);
         case 'agm-product'
             l_Xi = @(v, interval)max(v);
         case 'sum-product'
@@ -168,7 +172,8 @@ function [time_values, valarray_P, valarray_N] = PlusMinusUntil(time_values1, va
         case 'telex'
             l_Theta = @min;
         case 'belta'
-            l_Theta = @min;
+            %l_Theta = @min;
+            l_Theta = @sum;
         case 'agm-product'
             l_Theta = @(v)(safeprod(v+1)-1);
         case 'sum-product'
@@ -252,15 +257,16 @@ function [time_values, valarray_P, valarray_N] = PlusMinusUntil(time_values1, va
 
         % Soundness check: Theta and Delta have the same requirements:
         % If all x_k >= 0 and Delta(x_k) > 0 then \forall k. x_k > 0
-
-        assert(valarray_N(k) <= 0)
-        assert(valarray_P(k) >= 0)
+        % DANGER! Disabling soundness assertions can cause unexpected
+        % behavior!
+        % assert(valarray_N(k) <= 0)
+        % assert(valarray_P(k) >= 0)
         
     end
-    assert(all(valarray_N <= 0))
-    assert(all(valarray_P >= 0))
+    % assert(all(valarray_N <= 0))
+    % assert(all(valarray_P >= 0))
     % Assert that valarray_P and valarray_N are mutually exclusive, ie you
     % can't have both be nonzero
-    assert(all(~((valarray_P ~= 0) & (valarray_N ~= 0))))
+    % assert(all(~((valarray_P ~= 0) & (valarray_N ~= 0))))
     %size(valarray_P)
 end

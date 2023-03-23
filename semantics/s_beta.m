@@ -23,7 +23,8 @@ function res = s_beta(v1, v2, semantics)
         case 'telex'
             res = max(v1, v2);
         case 'belta'
-            res = max(v1, v2);
+            %res = max(v1, v2);
+            res = beltamax(v1, v2);
         case 'agm-product'
             res = max(v1, v2);
         case 'sum-product'
