@@ -9,7 +9,7 @@ function res = s_mu(t, v, semantics)
         case 'max-breach'
             res = min(v, 0);
         case 'const-breach'
-            res = min(-100*sign(v), 0);
+            res = min(100*sign(v), 0);
         case 'plus-breach'
             res = min(v, 0);
         case 'telex'
