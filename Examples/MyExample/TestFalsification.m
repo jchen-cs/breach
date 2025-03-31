@@ -24,7 +24,7 @@ SysFalsify.SetParamRanges({'ModelIn_u0'}, [-0.2 1]);
 req = BreachRequirement(AboveZero);
 
 falsify = FalsificationProblem(SysFalsify, req);
-%falsify.solver = 'simulated_annealing'
+falsify.solver = 'simulated_annealing'
 falsify.solve();
 
 cex = falsify.GetFalse();

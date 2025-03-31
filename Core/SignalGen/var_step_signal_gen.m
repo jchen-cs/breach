@@ -85,7 +85,7 @@ classdef var_step_signal_gen < signal_gen
                 p = p';
             end
             
-            cp = this.cp;
+            cp = this.cp(1);
             X = zeros(numel(this.signals),numel(time));
             
             dt_cp = p(1:cp-1);
